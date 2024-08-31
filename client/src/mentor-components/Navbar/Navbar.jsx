@@ -51,7 +51,7 @@ const MentorNavbar = () => {
         <nav className="hidden md:flex space-x-6">
         </nav>
         <div className="relative flex flex-row gap-10 items-center" ref={menuRef}>
-          <Link to="/mentor/dashboard">
+          <Link to="/dashboard">
             <TfiDashboard className="text-2xl"/>
           </Link>
           <button
