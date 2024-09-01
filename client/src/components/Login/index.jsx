@@ -71,7 +71,7 @@ const Login = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [userType, setUserType] = useState("student"); // Initial value set to "student"
+  const userType = "mentor"
   const [rememberMe, setRememberMe] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -126,8 +126,6 @@ const Login = () => {
 
         if (userType === "mentor") {
           nav("/mentor/", { replace: true });
-        } else {
-          nav("/", { replace: true });
         }
 
         toast.success("Login successful");
@@ -150,43 +148,6 @@ const Login = () => {
             </h2>
             <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
               <div>
-                <RadioGroup
-                  row
-                  aria-labelledby="demo-row-radio-buttons-group-label"
-                  name="row-radio-buttons-group"
-                  className="mb-3"
-                  value={userType} // Bind to userType state
-                  onChange={(e) => setUserType(e.target.value)} // Update userType state on change
-                >
-                  <FormControlLabel
-                    value="student"
-                    control={
-                      <Radio
-                        sx={{
-                          color: 'black', // Unchecked color
-                          '&.Mui-checked': {
-                            color: '#1976d2', // Checked color (blue)
-                          },
-                        }}
-                      />
-                    }
-                    label="Student"
-                  />
-                  <FormControlLabel
-                    value="mentor"
-                    control={
-                      <Radio
-                        sx={{
-                          color: 'black', // Unchecked color
-                          '&.Mui-checked': {
-                            color: '#1976d2', // Checked color (blue)
-                          },
-                        }}
-                      />
-                    }
-                    label="Mentor"
-                  />
-                </RadioGroup>
                 <label className="text-gray-800 text-sm mb-2 block">
                   User name
                 </label>

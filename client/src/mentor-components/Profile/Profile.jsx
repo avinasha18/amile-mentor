@@ -19,15 +19,13 @@ const MentorProfile = () => {
     const [user, setUser] = useState({});
     const userData = useSelector((state) => state.auth.userData);
     const [newItem, setNewItem] = useState({});
-    let titles = user.title;
-
-    if (titles) {
-        titles = titles.split(",");
-    }
 
     useEffect(() => {
         getUser();
     }, []);
+
+    const titles = user?.title ? user.title.split(",") : [];
+    console.log(titles)
 
     const hasQualifications =
         user?.qualifications && user?.qualifications.length > 0;
@@ -108,7 +106,7 @@ const MentorProfile = () => {
     const getUser = async () => {
         try {
             const response = await Actions.fetchMentor();
-
+            console.log(response)
             if (response.data.success) {
                 dispatch(setUserData(response.data.data));
                 setUser(response.data.data);
