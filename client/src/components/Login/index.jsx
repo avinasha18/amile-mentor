@@ -125,7 +125,7 @@ const Login = () => {
         const isnext = params.get("nextpath");
 
         if (userType === "mentor") {
-          nav("/mentor/", { replace: true });
+          nav("/", { replace: true });
         }
 
         toast.success("Login successful");

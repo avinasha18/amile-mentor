@@ -1,19 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit';
 import Cookies from 'js-cookie';
-import { act } from 'react';
 
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    token: Cookies.get('token') || null,
-    user: Cookies.get('user') || null,
-    userData: (() => {
-      const userDataCookie = Cookies.get('userData');
-      if (userDataCookie) {
+    token: Cookies.get('mentortoken') || null,
+    mentor: Cookies.get('mentor') || null,
+    mentorData: (() => {
+      const mentorDataCookie = Cookies.get('mentorData');
+      if (mentorDataCookie) {
         try {
-          return JSON.parse(userDataCookie) || {};
+          return JSON.parse(mentorDataCookie) || {};
         } catch (e) {
-          console.error("Error parsing userData cookie:", e);
+          console.error("Error parsing mentorData cookie:", e);
           return {};
         }
       }
@@ -22,33 +21,34 @@ const authSlice = createSlice({
   },
   reducers: {
     loginSuccess: (state, action) => {
-      const { token ,user} = action.payload;
-      console.log(action.payload)
+      const { token, user } = action.payload;
       state.token = token;
-      state.user = user.username;
-      Cookies.set('token', token, { expires: action.payload.cookieExpires || 1});
-      Cookies.set('user', user.username, { expires: action.payload.cookieExpires || 1}); 
-      Cookies.set('userData', JSON.stringify(user), { expires: action.payload.cookieExpires || 1}); 
-
-      Cookies.set('userId', user._id, { expires: action.payload.cookieExpires || 1}); 
-
+      state.mentor = user.username;
+      Cookies.set('mentortoken', token, { expires: action.payload.cookieExpires || 1 });
+      Cookies.set('mentor', user.username, { expires: action.payload.cookieExpires || 1 });
+      Cookies.set('mentorData', JSON.stringify(user), { expires: action.payload.cookieExpires || 1 });
+      Cookies.set('mentorId', user._id, { expires: action.payload.cookieExpires || 1 });
     },
     logout: (state) => {
       state.token = null;
-      state.user = null;
-      state.userData = {};
-      Cookies.remove('token');
-      Cookies.remove('user');
-      Cookies.remove('userData');
+      state.mentor = null;
+      state.mentorData = {};
+      Cookies.remove('mentortoken');
+      Cookies.remove('mentor');
+      Cookies.remove('mentorData');
+      Cookies.remove('mentorId');
     },
-    setUserData: (state, action) => {
-      state.userData = action.payload.user;
-      console.log(action.payload,'in set user data')
-      Cookies.set('userData',JSON.stringify(action.payload), { expires: action.payload?.cookieExpires || 7}); 
+    setmentorData: (state, action) => {
+      if (action.payload && typeof action.payload === 'object') {
+        state.mentorData = action.payload.username || {}; // Accessing username safely
+        Cookies.set('mentorData', JSON.stringify(action.payload), { expires: action.payload?.cookieExpires || 7 });
+      } else {
+        console.error('setmentorData received undefined or invalid payload:', action.payload);
+      }
+    },
 
-    },
   },
 });
 
-export const { loginSuccess, logout, setUserData } = authSlice.actions;
+export const { loginSuccess, logout, setmentorData } = authSlice.actions;
 export default authSlice.reducer;

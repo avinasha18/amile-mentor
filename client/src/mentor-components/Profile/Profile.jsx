@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
 import { FaSquareGithub } from "react-icons/fa6";
 import { FaInstagram, FaLinkedin, FaPaperclip } from "react-icons/fa";
-import { setUserData } from "../../services/redux/AuthSlice";
+import { setmentorData } from "../../services/redux/AuthSlice";
 import { useTheme } from "../../context/ThemeContext";
 import { Actions } from "../../hooks/actions";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,21 +11,23 @@ import { useDispatch, useSelector } from "react-redux";
 const MentorProfile = () => {
     const { isDarkMode } = useTheme();
     const [isEditing, setIsEditing] = useState(false);
+    const [loading, setLoading] = useState(false)
     const [isEditingSkills, setIsEditingSkills] = useState(false);
     const [activeTab, setActiveTab] = useState("Qualifications");
     const dispatch = useDispatch();
 
     const tabs = ["Qualifications", "Experience", "Certifications"];
     const [user, setUser] = useState({});
-    const userData = useSelector((state) => state.auth.userData);
+    const mentorData = useSelector((state) => state.auth.mentorData);
     const [newItem, setNewItem] = useState({});
 
     useEffect(() => {
-        getUser();
+        getUser().then(() => setLoading(false));
     }, []);
-
+    if(loading) {
+        return <div>Loading...</div>
+    }
     const titles = user?.title ? user.title.split(",") : [];
-    console.log(titles)
 
     const hasQualifications =
         user?.qualifications && user?.qualifications.length > 0;
@@ -106,15 +108,18 @@ const MentorProfile = () => {
     const getUser = async () => {
         try {
             const response = await Actions.fetchMentor();
-            console.log(response)
-            if (response.data.success) {
-                dispatch(setUserData(response.data.data));
-                setUser(response.data.data);
+    
+            if (response.data && response.data.success) {
+                dispatch(setmentorData(response.data.data)); // Dispatch user data
+                setUser(response.data.data); // Set user state in component
+            } else {
+                console.error('fetchMentor did not return success:', response.data);
             }
         } catch (e) {
-            console.log(e);
+            console.log('Error in getUser:', e);
         }
     };
+    
 
     const handleSkillEdit = () => {
         setIsEditingSkills(!isEditingSkills);
@@ -134,7 +139,7 @@ const MentorProfile = () => {
                 const updatedUser = { ...user, skills: updatedSkills };
                 const response = await Actions.updateMentor(updatedUser);
                 if (response.data.success) {
-                    dispatch(setUserData(response.data.data));
+                    dispatch(setmentorData(response.data.data));
                 } else {
                     console.log("Failed to add skill");
                 }
@@ -191,8 +196,8 @@ const MentorProfile = () => {
         try {
             const response = await Actions.updateMentor(updatedUser);
             if (response.data.success) {
-                dispatch(setUserData(response.data.data));
-                setUser(response.data.data);
+                dispatch(setmentorData(response.data.updatedUser));
+                setUser(response.data.updatedUser);
             } else {
                 console.log("Failed to update user");
             }
@@ -228,7 +233,7 @@ const MentorProfile = () => {
             const response = await Actions.updateMentor(updatedUser);
 
             if (response.data.success) {
-                dispatch(setUserData(response.data.data));
+                dispatch(setmentorData(response.data.data));
             } else {
                 console.log("Failed to add item");
             }
@@ -525,17 +530,17 @@ const MentorProfile = () => {
                                     {isEditing ? (
                                         <input
                                             type="text"
-                                            value={user.name}
+                                            value={user?.name}
                                             onChange={(e) => handleEdit("name", e.target.value)}
                                             className="px-2 py-1 rounded mb-2 bg-slate-700 text-white mr-2"
                                         />
                                     ) : (
-                                        <h1 className={`text-2xl font-bold ${themeStyles.heading}`}>{user.name}</h1>
+                                        <h1 className={`text-2xl font-bold ${themeStyles.heading}`}>{user?.name}</h1>
                                     )}
                                     {isEditing ? (
                                         <input
                                             type="text"
-                                            value={user.title}
+                                            value={user?.title}
                                             onChange={(e) => handleEdit("title", e.target.value)}
                                             className="px-2 py-1 rounded mb-2 bg-slate-700 text-white"
                                         />
@@ -546,7 +551,7 @@ const MentorProfile = () => {
                                                     key={index}
                                                     className={`${themeStyles.skillTag} px-4 py-2 rounded-md`}
                                                 >
-                                                    {title.trim()}
+                                                    {title?.trim()}
                                                 </p>
                                             ))}
                                         </div>
@@ -660,7 +665,7 @@ const SocialMedia = ({ media, user }) => {
                         <FaSquareGithub />
                         {
                             user?.github ? (
-                                <Link to="">
+                                <Link to={user.github}>
                                     <h1>Github</h1>
                                 </Link>
                             ) : (
@@ -677,7 +682,7 @@ const SocialMedia = ({ media, user }) => {
                         <FaLinkedin />
                         {
                             user?.linkedin ? (
-                                <Link to="">
+                                <Link to={user.linkedin}>
                                     <h1>Linkedin</h1>
                                 </Link>
                             ) : (

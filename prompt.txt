@@ -1,0 +1,149 @@
+const updateUserInDatabase = async (updatedUser) => {
+        try {
+            const response = await Actions.updateMentor(updatedUser);
+            if (response.data.success) {
+                dispatch(setUserData(response.data.data));
+                setUser(response.data.data);
+            } else {
+                console.log("Failed to update user");
+            }
+        } catch (error) {
+            console.error("Error updating user:", error);
+        }
+    };
+
+
+    const handleEdit = async (field, value) => {
+        const updatedUser = { ...user, [field]: value };
+        setUser(updatedUser);
+        await updateUserInDatabase(updatedUser);
+    };
+
+
+    return (
+        <div className={`min-h-screen p-8 overflow-auto w-full bg-black ${themeStyles.background}`}>
+            <div className="max-w-6xl mx-auto flex flex-col gap-1 mb-10">
+                <div className="flex flex-shrink-0 gap-10">
+                    {/* Profile Section */}
+                    <div className={`rounded-lg p-6 mb-8 w-3/4 backdrop-blur-lg ${themeStyles.card} bg-opacity-50 shadow-lg border border-slate-500/30`}>
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center">
+                                <img
+                                    src="https://via.placeholder.com/100"
+                                    alt="Profile"
+                                    className="w-24 h-24 rounded-full mr-6"
+                                />
+                                <div>
+                                    {isEditing ? (
+                                        <input
+                                            type="text"
+                                            value={user.name}
+                                            onChange={(e) => handleEdit("name", e.target.value)}
+                                            className="px-2 py-1 rounded mb-2 bg-slate-700 text-white mr-2"
+                                        />
+                                    ) : (
+                                        <h1 className={`text-2xl font-bold ${themeStyles.heading}`}>{user.name}</h1>
+                                    )}
+                                    {isEditing ? (
+                                        <input
+                                            type="text"
+                                            value={user.title}
+                                            onChange={(e) => handleEdit("title", e.target.value)}
+                                            className="px-2 py-1 rounded mb-2 bg-slate-700 text-white"
+                                        />
+                                    ) : (
+                                        <div className={`flex flex-wrap gap-2 my-5`}>
+                                            {titles?.map((title, index) => (
+                                                <p
+                                                    key={index}
+                                                    className={`${themeStyles.skillTag} px-4 py-2 rounded-md`}
+                                                >
+                                                    {title.trim()}
+                                                </p>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setIsEditing(!isEditing)}
+                                className={`px-4 py-2 rounded ${themeStyles.button}`}
+                            >
+                                {isEditing ? "Save" : "Edit"}
+                            </button>
+                        </div>
+                    </div>
+                    {/* Social Media */}
+                    <div className={`rounded-lg p-6 mb-8 w-1/4 backdrop-blur-lg ${themeStyles.card} ${themeStyles.text} bg-opacity-50 shadow-lg border border-slate-500/30`}>
+                        <p className="text-xl font-bold mb-4">Social Media</p>
+                        <SocialMedia media="github" user={user}/>
+                        <SocialMedia media="linkedin" user={user}/>
+                    </div>
+                </div>
+
+                Profile.jsx:266 Error updating user: TypeError: Cannot read properties of undefined (reading 'user')
+    at setUserData (AuthSlice.js:45:39)
+    at @reduxjs_toolkit.js?v=d5ea3de2:2133:20
+    at Immer2.produce (@reduxjs_toolkit.js?v=d5ea3de2:898:20)
+    at @reduxjs_toolkit.js?v=d5ea3de2:2132:18
+    at Array.reduce (<anonymous>)
+    at reducer (@reduxjs_toolkit.js?v=d5ea3de2:2113:25)
+    at reducer (@reduxjs_toolkit.js?v=d5ea3de2:2518:14)
+    at combination (@reduxjs_toolkit.js?v=d5ea3de2:302:31)
+    at Object.dispatch (@reduxjs_toolkit.js?v=d5ea3de2:151:22)
+    at dispatch (@reduxjs_toolkit.js?v=d5ea3de2:1963:22)
+
+    import { createSlice } from '@reduxjs/toolkit';
+import Cookies from 'js-cookie';
+import { act } from 'react';
+
+const authSlice = createSlice({
+  name: 'auth',
+  initialState: {
+    token: Cookies.get('token') || null,
+    user: Cookies.get('user') || null,
+    userData: (() => {
+      const userDataCookie = Cookies.get('userData');
+      if (userDataCookie) {
+        try {
+          return JSON.parse(userDataCookie) || {};
+        } catch (e) {
+          console.error("Error parsing userData cookie:", e);
+          return {};
+        }
+      }
+      return {};
+    })(),
+  },
+  reducers: {
+    loginSuccess: (state, action) => {
+      const { token ,user} = action.payload;
+      console.log(action.payload)
+      state.token = token;
+      state.user = user.username;
+      Cookies.set('token', token, { expires: action.payload.cookieExpires || 1});
+      Cookies.set('user', user.username, { expires: action.payload.cookieExpires || 1}); 
+      Cookies.set('userData', JSON.stringify(user), { expires: action.payload.cookieExpires || 1}); 
+
+      Cookies.set('userId', user._id, { expires: action.payload.cookieExpires || 1}); 
+
+    },
+    logout: (state) => {
+      state.token = null;
+      state.user = null;
+      state.userData = {};
+      Cookies.remove('token');
+      Cookies.remove('user');
+      Cookies.remove('userData');
+    },
+    setUserData: (state, action) => {
+      state.userData = action.payload.user;
+      console.log(action.payload,'in set user data')
+      Cookies.set('userData',JSON.stringify(action.payload), { expires: action.payload?.cookieExpires || 7}); 
+
+    },
+  },
+});
+
+export const { loginSuccess, logout, setUserData } = authSlice.actions;
+export default authSlice.reducer;
