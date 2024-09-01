@@ -1,6 +1,7 @@
 // src/AuthSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 import Cookies from 'js-cookie';
+import { act } from 'react';
 
 const authSlice = createSlice({
   name: 'auth',
@@ -11,12 +12,14 @@ const authSlice = createSlice({
   },
   reducers: {
     loginSuccess: (state, action) => {
-      const { token ,user,userId} = action.payload;
+      const { token ,user} = action.payload;
+      console.log(action.payload)
       state.token = token;
       state.user = user.username;
-      console.log(action.payload.userId,"user id")
       Cookies.set('token', token, { expires: action.payload.cookieExpires || 1});
       Cookies.set('user', user.username, { expires: action.payload.cookieExpires || 1}); 
+      Cookies.set('userData', JSON.stringify(user), { expires: action.payload.cookieExpires || 1}); 
+
       Cookies.set('userId', user._id, { expires: action.payload.cookieExpires || 1}); 
 
     },
@@ -28,7 +31,8 @@ const authSlice = createSlice({
       Cookies.remove('userData');
     },
     setUserData: (state, action) => {
-      state.userData = action.payload;
+      state.userData = action.payload.user;
+      console.log(action.payload,'in set user data')
       Cookies.set('userData',JSON.stringify(action.payload), { expires: action.payload?.cookieExpires || 7}); 
 
     },

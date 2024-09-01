@@ -108,7 +108,7 @@ const MentorProfile = () => {
     const getUser = async () => {
         try {
             const response = await Actions.fetchMentor();
-
+            console.log(response)
             if (response.data.success) {
                 dispatch(setUserData(response.data.data));
                 setUser(response.data.data);

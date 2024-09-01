@@ -308,6 +308,7 @@ export const loginUser = async (req, res) => {
             return res.json({ success: false, message: "Invalid password" });
         }
     } catch (e) {
+        console.log(e.message)
         res.status(500).send("Server error");
     }
 };
@@ -333,6 +334,7 @@ export const reportIncident = async (req, res) => {
 };
 
 export const getUser = async (req, res) => {
+    console.log('in get mentor')
     try {
         const { username } = req.body;
         if (!username) {
@@ -343,7 +345,7 @@ export const getUser = async (req, res) => {
         if (!userdata) {
             return res.json({ success: false, message: "User not found" });
         }
-
+        console.log(userdata)
         return res.json({ success: true, data: userdata });
     } catch (e) {
         console.error(e);
