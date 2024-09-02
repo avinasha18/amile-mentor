@@ -8,6 +8,7 @@ import MentorNavbar from '../Navbar/Navbar'; // If this navbar is not needed, re
 import MentorSidebar from '../Sidebar';
 import MentorProfile from '../Profile/Profile';
 import Dashboard from '../Dashboard';
+import TanStackTable from '../StudentList/TanStackTable';
 
 const MentorRouteManagement = () => {
   return (
@@ -23,6 +24,7 @@ const MentorRouteManagement = () => {
               <Route path="/courses" element={<MentorCourses />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/aimock" element={<InterviewApp />} />
+              <Route path="/students" element={<TanStackTable />} />
               <Route path="/courses/:id" element={<MentorCourseDetails />} />
             </Routes>
           </div>
