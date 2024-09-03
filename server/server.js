@@ -1,4 +1,3 @@
-// server.js
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
@@ -6,8 +5,7 @@ import { connectToMongoDB } from './db.js';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import chatRoutes from './routes/chattingRoutes.js';
-import mentorRoutes from "./routes/mentorRoutes.js";
-import { VerifyMentorAccountwithToken } from './controllers/mentorController.js';
+import mentorRoutes from './routes/mentorRoutes.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -26,12 +24,11 @@ app.use(cors({
 app.use(express.json());
 app.use(bodyParser.json());
 
-
-
 app.use("/", mentorRoutes);
 app.use('/', chatRoutes(io));
+
 io.on('connection', (socket) => {
-  // console.log('A user connected:', socket.id);
+  console.log('A user connected:', socket.id);
 
   socket.on('joinRoom', (room) => {
     socket.join(room);
@@ -42,9 +39,8 @@ io.on('connection', (socket) => {
     io.to(room).emit('receiveMessage', { chat, message });
   });
 
-
   socket.on('disconnect', () => {
-    // console.log('User disconnected:', socket.id);
+    console.log('User disconnected:', socket.id);
   });
 });
 

@@ -1,33 +1,34 @@
 import express from 'express';
-import { Chat } from '../models/chat.model.js';
+import { MentorChat } from '../models/MentorChat.model.js';
+
+
 
 const router = express.Router();
-
 export default (io) => {
   router.get('/student/:studentId', async (req, res) => {
     try {
-      const chats = await Chat.find({ studentId: req.params.studentId });
+      const chats = await MentorChat.find({ studentId: req.params.studentId });
       res.json(chats);
     } catch (err) {
       res.status(500).json({ error: 'Internal server error' });
     }
   });
 
-  router.get('/company/:companyId', async (req, res) => {
+  router.get('/mentor/:mentorId', async (req, res) => {
     try {
-      const chats = await Chat.find({ companyId: req.params.companyId });
+      const chats = await MentorChat.find({ mentorId: req.params.mentorId });
       res.json(chats);
     } catch (err) {
       res.status(500).json({ error: 'Internal server error' });
     }
   });
 
-  router.get('/company/:companyId/student/:studentId', async (req, res) => {
-    const { companyId, studentId } = req.params;
+  router.get('/mentor/:mentorId/student/:studentId', async (req, res) => {
+    const { mentorId, studentId } = req.params;
     try {
-      let chat = await Chat.findOne({ companyId, studentId });
+      let chat = await MentorChat.findOne({ mentorId, studentId });
       if (!chat) {
-        chat = new Chat({ companyId, studentId, messages: [] });
+        chat = new MentorChat({ mentorId, studentId, messages: [] });
         await chat.save();
       }
       res.json(chat);
@@ -37,16 +38,16 @@ export default (io) => {
   });
 
   router.post('/send', async (req, res) => {
-    const { companyId, studentId, text, sender } = req.body;
+    const { mentorId, studentId, text, sender } = req.body;
     try {
-      let chat = await Chat.findOne({ companyId, studentId });
+      let chat = await MentorChat.findOne({ mentorId, studentId });
       if (!chat) {
-        chat = new Chat({ companyId, studentId, messages: [] });
+        chat = new MentorChat({ mentorId, studentId, messages: [] });
       }
       chat.messages.push({ text, sender });
       await chat.save();
 
-      const room = `${companyId}-${studentId}`;
+      const room = `${mentorId}-${studentId}`;
       io.to(room).emit('receiveMessage', { chat });
 
       res.json(chat);

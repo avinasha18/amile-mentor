@@ -7,7 +7,7 @@ import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-
+import { useTheme } from '../../context/ThemeContext'; // Ensure this is the correct path
 
 const courses = [
     {
@@ -21,31 +21,32 @@ const courses = [
         registered: 10970
     },
     {
-        id: 2, title: 'Advanced React', courseType: 'Professional Certificate', courseImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUJIfwlzSyckDVXxiAg62c4yBZBY9vhYJWEw&s',
+        id: 3, title: 'Advanced React', courseType: 'Professional Certificate', courseImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUJIfwlzSyckDVXxiAg62c4yBZBY9vhYJWEw&s',
         rating: 3,
         registered: 10970
     },
     {
-        id: 2, title: 'Advanced React', courseType: 'Professional Certificate', courseImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUJIfwlzSyckDVXxiAg62c4yBZBY9vhYJWEw&s',
+        id: 4, title: 'Advanced React', courseType: 'Professional Certificate', courseImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUJIfwlzSyckDVXxiAg62c4yBZBY9vhYJWEw&s',
         rating: 3,
         registered: 10970
     },
     {
-        id: 2, title: 'Advanced React', courseType: 'Professional Certificate', courseImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUJIfwlzSyckDVXxiAg62c4yBZBY9vhYJWEw&s',
+        id: 5, title: 'Advanced React', courseType: 'Professional Certificate', courseImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUJIfwlzSyckDVXxiAg62c4yBZBY9vhYJWEw&s',
         rating: 3,
         registered: 10970
     },
 ];
 
 const MentorCourses = () => {
+    const { isDarkMode } = useTheme();
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
     return (
-        <div className='p-10 bg-black'>
-            <div className="mt-6 float-right bg-black lg:mt-0">
-                <Button onClick={handleOpen} 
+        <div className={`p-10 ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
+            <div className="mt-6 float-right lg:mt-0">
+                <Button onClick={handleOpen}
                     sx={{
                         color: 'white',
                         backgroundColor: '#134B70',
@@ -78,19 +79,17 @@ const MentorCourses = () => {
                     </Fade>
                 </Modal>
             </div>
-            <div className="p-6 grid grid-cols-1 gap-y-10 md:grid-cols-2 lg:grid-cols-3 w-full overflow-y-auto py-10">
+            <div className="p-6 grid grid-cols-1 gap-y-10 gap-x-5 md:grid-cols-2 lg:grid-cols-3 w-full overflow-y-auto py-10">
                 {courses.map((course) => (
-                    <Link key={course.id} to={`/mentor/courses/${course.id}`} className="backdrop-blur-lg bg-opacity-20 rounded-lg shadow hover:shadow-lg transition-shadow">
-                        <div className=' h-full relative'>
-                            <img src={course.courseImage} alt={course.title} className='w-5/6 h-1/2 mb-5 rounded-lg' />
-                            <div className='px-4'>
-                                <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
-                                <p className='opacity-40'>{course.courseType}</p>
-                                <div className='flex flex-shrink-0 gap-2 my-2 font-mono'>
-                                    <h3 className='font-semibold'>{course.rating}</h3>
-                                    <Rating name="half-rating-read" defaultValue={course.rating} precision={0.5} readOnly className='opacity-90' />
-                                    <p className='opacity-40'>({course.registered})</p>
-                                </div>
+                    <Link key={course.id} to={`/mentor/courses/${course.id}`} className={`border rounded-lg shadow hover:shadow-lg transition-shadow ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'}`}>
+                        <div className='h-full relative p-4 m-3'>
+                            <img src={course.courseImage} alt={course.title} className='w-full h-48 mb-4 rounded-lg' />
+                            <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
+                            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{course.courseType}</p>
+                            <div className='flex items-center gap-2 my-2 font-mono'>
+                                <h3 className='font-semibold'>{course.rating}</h3>
+                                <Rating name="half-rating-read" defaultValue={course.rating} precision={0.5} readOnly className='opacity-90' />
+                                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>({course.registered})</p>
                             </div>
                         </div>
                     </Link>

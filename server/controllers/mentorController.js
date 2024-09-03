@@ -13,6 +13,7 @@ import { HtmlTemplates } from "../services/htmlTemplates.js";
 import { sendEmail } from "../services/mailServices.js";
 const JWT_SECRET = process.env.JWT_SECRET;
 
+import { Student } from '../models/auth.model.js';
 
 export const updateUserMentor = async (userData) => {
     const {
@@ -352,6 +353,22 @@ export const getUser = async (req, res) => {
         return res.status(500).json({ success: false, message: e.message });
     }
 };
+
+export const getStudentData = async (req,res)=> {
+        const {username} = req.body 
+        try {
+            const studentData = await findUserByUsername(username, Student)
+            if (!studentData) {
+                return res.json({ success: false, message: "User not found" });
+            }
+            console.log(studentData)
+            return res.json({ success: true, data: studentData });
+        }
+        catch(e){
+            console.log(e.message)
+            return res.status(500).json({ success: false, message: e.message });
+        }
+}
 
 export const updateMentor = async (req, res) => {
     const { username, ...otherDetails } = req.body;

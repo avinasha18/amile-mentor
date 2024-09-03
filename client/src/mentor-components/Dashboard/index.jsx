@@ -1,181 +1,278 @@
-import React from 'react';
-import { Box, Typography, Card, CardContent } from '@mui/material';
-import { Person, Feedback, School } from '@mui/icons-material'; // Importing icons from Material-UI
-import { PiStudentFill } from "react-icons/pi";
-import { GiMoneyStack } from "react-icons/gi";
-import { FiInfo } from "react-icons/fi";
-import MentorProgress from './MentorProgress';
+import React, { useEffect, useState } from 'react';
+import { Bar, Radar, Doughnut } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, ArcElement, LinearScale, BarElement, RadialLinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import { useTheme } from '../../context/ThemeContext';
+import Cookies from 'js-cookie';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { FaUserCircle, FaDollarSign, FaBookOpen, FaStar, FaTasks } from 'react-icons/fa';
+import DashboardBox from './DashboardBox'; // Ensure this is the correct path
+import { FaChalkboardTeacher } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import UserDetailModal from '../StudentList/UserDetailModal';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  ArcElement,
+  BarElement,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const Dashboard = () => {
-    const { isDarkMode } = useTheme();
+  const { isDarkMode } = useTheme();
+  const [statistics, setStatistics] = useState(null);
+  const navigate = useNavigate();
+  const [selectedUser, setSelectedUser] = useState(null);
+  const userId = Cookies.get('mentorId');
+  const userType = 'mentor';
 
-    const studentsAssigned = 1234;
+  const handleStartChat = (user) => {
+    setSelectedUser(user);
+  };
 
-    const feedback = [
-        { date: '2024-08-01', comment: 'Great mentor, very helpful!' },
-        { date: '2024-08-10', comment: 'Needs to improve communication.' },
-        { date: '2024-08-15', comment: 'Excellent at explaining concepts.' },
-    ];
+  useEffect(() => {
+    const fetchStatistics = async () => {
+      try {
+        const currentUserId = Cookies.get('userId');
+        // Replace with actual API call
+        const data = {
+          totalStudents: 35,
+          coursesCreated: 12,
+          skillRating: [90, 85, 80, 70, 75, 60],
+          studentsProgress: [80, 60, 90, 50, 70, 85],
+          earnings: {
+            total: 4500,
+            available: 1500,
+            withdrawn: 3000,
+          },
+          students: [
+            { id: '66d5748a72523c01edd47c19', name: 'avinasha', progress: '80%', course: 'React Basics' },
+            { id: 2, name: 'Jane Smith', progress: '60%', course: 'Advanced JavaScript' },
+            { id: 3, name: 'Sam Wilson', progress: '90%', course: 'Node.js Mastery' },
+          ],
+          studentsPlaced: 20,
+        };
+        setStatistics(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
-    const courses = [
-        { title: 'Data Structures and Algorithms', students: 30 },
-        { title: 'Web Development', students: 25 },
-        { title: 'Machine Learning', students: 20 },
-    ];
+    fetchStatistics();
+  }, []);
 
-    return (
-        <Box
-            sx={{
-                minHeight: '100vh',
-                background: `${isDarkMode ? 'black' : '#f8f8f8'}`,
-                color: `${isDarkMode ? 'white' : 'black'}`,
-                display: 'flex',
-                flexDirection: 'column',
-                padding: '24px',
-                paddingBottom: '30px'
-            }}
-        >
-            <Typography
-                variant="h4"
-                gutterBottom
-                sx={{
-                    fontWeight: 'bold',
-                    textAlign: 'center',
-                    mb: '20px',
-                    fontSize: '1.5rem',
-                }}
-            >
-                Mentor Dashboard
-            </Typography>
+  if (!statistics) {
+    return <div>Loading...</div>;
+  }
 
-            {/* First Row: Cards */}
-            <Box
-                sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '30px',
-                }}
-            >
-                {/* Students Card */}
-                <Card
-                    sx={{
-                        background: `${isDarkMode ? 'linear-gradient(to right, #03346E, #021526)' : 'white'}`,
-                        backgroundSize: 'cover',
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'center',
-                        color: `${isDarkMode ? 'white' : 'black'}`,
-                        borderRadius: '10px',
-                        width: '31%',
-                        height: '150px',
-                        transition: 'transform 0.3s ease, box-shadow 0.3s ease'
-                    }}
-                >
-                    <div className='p-8'>
-                        <div className='flex items-center justify-between'>
-                            <div className='flex flex-shrink-0 items-center gap-2 mb-2'>
-                                <PiStudentFill className='text-2xl'/>
-                                <h1 className='text-lg font-semibold'>Students Assigned</h1>
-                            </div>
-                            <button className='p-1 rounded-full hover:bg-gray-200'>
-                                <FiInfo className='text-xl opacity-40'/>
-                            </button>
-                        </div>
-                        <p className='text-2xl font-semibold font-mono'>{studentsAssigned}</p>
-                    </div>
-                </Card>
+  const skillData = {
+    labels: ['JavaScript', 'React', 'Node.js', 'CSS', 'Python', 'SQL'],
+    datasets: [
+      {
+        label: 'Skill Level',
+        data: statistics.skillRating,
+        backgroundColor: 'rgba(34, 202, 236, 0.2)',
+        borderColor: 'rgba(34, 202, 236, 1)',
+        borderWidth: 2,
+        pointBackgroundColor: 'rgba(34, 202, 236, 1)',
+        pointBorderColor: '#fff',
+      },
+    ],
+  };
 
-                <Card
-                    sx={{
-                        background: `${isDarkMode ? 'linear-gradient(to right, #03346E, #021526)' : 'white'}`,
-                        backgroundSize: 'cover',
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'center',
-                        color: `${isDarkMode ? 'white' : 'black'}`,
-                        borderRadius: '10px',
-                        width: '31%',
-                        height: '150px',
-                        transition: 'transform 0.3s ease, box-shadow 0.3s ease'
-                    }}
-                >
-                    <div className='p-8'>
-                        <div className='flex items-center justify-between'>
-                            <div className='flex flex-shrink-0 items-center gap-2 mb-2'>
-                                <PiStudentFill className='text-2xl'/>
-                                <h1 className='text-lg font-semibold'>Students Assigned</h1>
-                            </div>
-                            <button className='p-1 rounded-full hover:bg-gray-200'>
-                                <FiInfo className='text-xl opacity-40'/>
-                            </button>
-                        </div>
-                        <p className='text-2xl font-semibold font-mono'>{studentsAssigned}</p>
-                    </div>
-                </Card>
+  const skillOptions = {
+    plugins: {
+      legend: {
+        display: false,
+      },
+    },
+    scales: {
+      r: {
+        beginAtZero: true,
+        suggestedMin: 50,
+        suggestedMax: 100,
+      },
+    },
+    responsive: true,
+    maintainAspectRatio: false,
+  };
 
-                {/* Courses Card */}
-                <Card
-                    sx={{
-                        background: `${isDarkMode ? 'linear-gradient(to right, #03346E, #021526)' : 'white'}`,
-                        backgroundSize: 'cover',
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'center',
-                        color: `${isDarkMode ? 'white' : 'black'}`,
-                        borderRadius: '10px',
-                        width: '31%',
-                        height: '150px',
-                        transition: 'transform 0.3s ease, box-shadow 0.3s ease'
-                    }}
-                >
-                    <div className='p-8'>
-                        <div className='flex items-center justify-between'>
-                            <div className='flex flex-shrink-0 items-center gap-2 mb-2'>
-                                <GiMoneyStack className='text-2xl'/>
-                                <h1 className='text-lg font-semibold'>Total Revenue</h1>
-                            </div>
-                            <button className='p-1 rounded-full hover:bg-gray-200'>
-                                <FiInfo className='text-xl opacity-40'/>
-                            </button>
-                        </div>
-                        <p className='text-2xl font-semibold font-mono'>{studentsAssigned}</p>
-                    </div>
-                </Card>
-            </Box>
+  const progressData = {
+    labels: ['John Doe', 'Jane Smith', 'Sam Wilson', 'Alex Brown', 'Emily Davis', 'Michael Johnson'],
+    datasets: [
+      {
+        label: 'Student Progress',
+        data: statistics.studentsProgress,
+        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#FF8000', '#66B2FF', '#FF9900'],
+        borderColor: ['#FF6384', '#36A2EB', '#FFCE56', '#FF8000', '#66B2FF', '#FF9900'],
+        borderWidth: 2,
+      },
+    ],
+  };
 
-            {/* Second Row: Graph */}
-            <Box
-                sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginTop: '5px',
-                }}
-            >
-                <Card
-                    sx={{
-                        width: '70%',
-                        height: '500px',
-                        borderRadius: '20px',
-                        transition: 'transform 0.3s ease, box-shadow 0.3s ease'
-                    }}
-                >
-                    <MentorProgress
-                        sx={{
-                            height: '100%',
-                            width: '100%',
-                            '& .line-graph': {
-                                stroke: '#00c6ff',
-                            },
-                            '& .line-graph-text': {
-                                color: '#dcdcdc',
-                                fontSize: '0.8rem',
-                            },
-                        }}
-                    />
-                </Card>
-            </Box>
-        </Box>
-    );
+  const progressOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: true,
+        text: 'Overall Students Progress',
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 100,
+        ticks: {
+          stepSize: 10,
+        },
+      },
+    },
+  };
+
+  const revenueData = {
+    labels: ['Total Revenue', 'Available', 'Withdrawn'],
+    datasets: [
+      {
+        data: [statistics.earnings.total, statistics.earnings.available, statistics.earnings.withdrawn],
+        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+        borderWidth: 0,
+      },
+    ],
+  };
+
+  const revenueOptions = {
+    cutout: '70%',
+    plugins: {
+      legend: {
+        display: true,
+        position: 'bottom',
+      },
+    },
+    responsive: true,
+    maintainAspectRatio: false,
+  };
+
+  const studentsPlacedData = {
+    labels: ['Total Students', 'Students Placed'],
+    datasets: [
+      {
+        data: [statistics.totalStudents, statistics.studentsPlaced],
+        backgroundColor: ['#FF6384', '#36A2EB'],
+        borderWidth: 0,
+      },
+    ],
+  };
+
+  const studentsPlacedOptions = {
+    cutout: '70%',
+    plugins: {
+      legend: {
+        display: true,
+        position: 'bottom',
+      },
+    },
+    responsive: true,
+    maintainAspectRatio: false,
+  };
+
+  return (
+    <>
+    <div className={`right-content overflow-y-auto no-scrollbar w-full ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'} p-6`}>
+      {/* Dashboard Boxes */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full mt-6">
+        <DashboardBox color={["#FF6384", "#FF80A1"]} icon={<FaUserCircle />} title={'Total Students'} value={statistics.totalStudents} />
+        <DashboardBox color={["#36A2EB", "#5AA0FF"]} icon={<FaBookOpen />} title={'Courses Taught'} value={statistics.coursesCreated} />
+        <DashboardBox color={["#FFCE56", "#FFDF7B"]} icon={<FaStar />} title={'Avg Feedback'} value={statistics.avgFeedback} />
+        <DashboardBox color={["#FF8000", "#FF9900"]} icon={<FaTasks />} title={'Completed Sessions'} value={statistics.completedSessions} />
+      </div>
+
+      {/* Charts and Table */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 m-5">
+        {/* Left Column - Charts */}
+        <div className="space-y-6">
+          {/* Progress Bar Chart */}
+          <div className={`p-4 rounded-lg shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+            <h2 className="text-xl font-semibold mb-4 text-center">Students Progress</h2>
+            <div className="relative h-64">
+              <Bar data={progressData} options={progressOptions} />
+            </div>
+          </div>
+
+          {/* Skill Rating Radar Chart */}
+          <div className={`p-4 rounded-lg shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+            <h2 className="text-xl font-semibold mb-4 text-center">Skill Rating</h2>
+            <div className="relative h-64">
+              <Radar data={skillData} options={skillOptions} />
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column - Table and Revenue Charts */}
+        <div className="flex flex-col space-y-6">
+          {/* Students Table */}
+          <div className={`p-4 rounded-lg shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+            <h2 className="text-xl font-semibold mb-4">Students Overview</h2>
+            <TableContainer component={Paper} className={`border h-[250px] ${isDarkMode ? 'border-gray-700' : 'border-gray-300'}`}>
+              <Table>
+                <TableHead>
+                  <TableRow className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
+                    <TableCell className={`${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Name</TableCell>
+                    <TableCell className={`${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Course</TableCell>
+                    <TableCell className={`${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Progress</TableCell>
+                    <TableCell className={`${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {statistics.students.map((student) => (
+                    <TableRow key={student.id} className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                      <TableCell>{student.name}</TableCell>
+                      <TableCell>{student.course}</TableCell>
+                      <TableCell>{student.progress}</TableCell>
+                      <TableCell>
+                        <button onClick={() => handleStartChat(student)}>Message</button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </div>
+
+          {/* Revenue Pie Charts */}
+          <div className="flex space-x-6">
+            <div className={`flex-1 p-4 rounded-lg shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+              <h2 className="text-xl font-semibold mb-4 text-center">Revenue Overview</h2>
+              <div className="relative h-32">
+                <Doughnut data={revenueData} options={revenueOptions} />
+              </div>
+            </div>
+            <div className={`flex-1 p-4 rounded-lg shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+              <h2 className="text-xl font-semibold mb-4 text-center">Students Placed</h2>
+              <div className="relative h-32">
+                <Doughnut data={studentsPlacedData} options={studentsPlacedOptions} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {selectedUser && (
+        <UserDetailModal
+          user={selectedUser}
+          isOpen={!!selectedUser}
+          onClose={() => setSelectedUser(null)}
+        />
+      )}
+    </>
+  );
 };
 
 export default Dashboard;

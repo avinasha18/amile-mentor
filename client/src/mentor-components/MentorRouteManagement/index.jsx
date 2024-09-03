@@ -9,6 +9,7 @@ import MentorSidebar from '../Sidebar';
 import MentorProfile from '../Profile/Profile';
 import Dashboard from '../Dashboard';
 import TanStackTable from '../StudentList/TanStackTable';
+import Messages from '../Messages';
 
 const MentorRouteManagement = () => {
   return (
@@ -25,6 +26,7 @@ const MentorRouteManagement = () => {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/aimock" element={<InterviewApp />} />
               <Route path="/students" element={<TanStackTable />} />
+              <Route path='/messages' element={<Messages />}/>
               <Route path="/courses/:id" element={<MentorCourseDetails />} />
             </Routes>
           </div>
