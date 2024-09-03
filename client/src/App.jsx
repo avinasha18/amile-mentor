@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
@@ -15,10 +15,28 @@ import { ResendVerification } from "./components/resendVerification";
 import ReportIncident from "./components/reportIncident";
 import MentorRouteManagement from "./mentor-components/MentorRouteManagement";
 import { VerifyMentor } from './components/verifyAccount/verifyMentor';
+import socket from './services/socket/socket';
 
 function App() {
   const islogin = useSelector((state) => state.auth.token);
   setAuthToken(islogin);
+  const userId = useSelector((state) => state.auth.mentorData?._id);
+  const memoizedUserId = useMemo(() => userId, [userId]);
+  useEffect(() => {
+    if (islogin) {
+      socket.on('connect', () => {
+        socket.emit('joinChat', { userId: memoizedUserId });
+        console.log(`Emitted joinChat for User ID: ${memoizedUserId} on socket connect`);
+      });
+    }
+  
+    return () => {
+      socket.off('connect');
+    };
+  }, [islogin, memoizedUserId]);
+
+
+
   return (
     <ThemeProvider>
       <Routes>
