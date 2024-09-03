@@ -12,6 +12,7 @@ import DownloadBtn from "./DownloadBtn";
 import DebouncedInput from "./DebouncedInput";
 import UserDetailModal from "./UserDetailModal";
 import { fetchUserData } from "./data";
+import { Actions } from "../../hooks/actions";
 
 const TanStackTable = () => {
     const columnHelper = createColumnHelper();
@@ -21,21 +22,39 @@ const TanStackTable = () => {
     const [globalFilter, setGlobalFilter] = useState("");
 
     useEffect(() => {
-        // Get the username from cookies
-        const username = Cookies.get('mentor');
-
-        if (username) {
-            // Fetch the data for the logged-in user
-            const loadData = async () => {
+        const loadDataAndAssignStudents = async () => {
+            try {
+                // Get the username from cookies
+                const username = Cookies.get('mentor');
+    
+                if (!username) {
+                    console.error("Username cookie not found");
+                    return;
+                }
+    
+                // Fetch the data for the logged-in user
                 const userData = await fetchUserData(username);
                 setData(userData);
-            };
+                console.log(userData);
+    
+                const studentUsernames = userData.map(student => student.userName);
 
-            loadData();
-        } else {
-            console.error("Username cookie not found");
-        }
-    }, []);
+                // Now, assign students with the fetched user data
+                const response = await Actions.assignStudent({ mentorUsername: username, studentUsernames: studentUsernames });
+    
+                if (response.data.success) {
+                    console.log(response.data.message);
+                } else {
+                    console.log(response.data.message);
+                }
+    
+            } catch (err) {
+                console.error("Error occurred:", err);
+            }
+        };
+    
+        loadDataAndAssignStudents();
+    }, []);    
 
     const columns = [
         columnHelper.accessor("id", {

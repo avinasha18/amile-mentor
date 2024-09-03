@@ -49,6 +49,9 @@ export const Actions = {
     },
     fetchCourse: async (data) => {
         return await axios.get(`${api}/course?courseid=${data.courseid}`);
+    },
+    assignStudent: async (data) => {
+        return await axios.post(`${api}/assign`, data);
     }
 };
 

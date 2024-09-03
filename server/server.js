@@ -15,7 +15,6 @@ const io = new Server(server, {
     methods: ["GET", "POST"]
   }
 });
-
 app.use(cors({
   origin: "http://localhost:5174",
   methods: ["GET", "POST", "PUT", "DELETE"],
@@ -23,7 +22,6 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(bodyParser.json());
-
 app.use("/", mentorRoutes);
 app.use('/', chatRoutes(io));
 

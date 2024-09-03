@@ -4,21 +4,22 @@ import { stringify } from "uuid";
 
 const studentSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
-  profilePictureUrl : {type : String},
+  profilePictureUrl: { type: String },
   password: { type: String, required: true },
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   status: { type: String, required: true, default: "inactive" },
   education: [String],
   workExperience: [String],
-  projects: [{ title:{type:String},description:{type:String},link:{type:String}}],
+  projects: [{ title: { type: String }, description: { type: String }, link: { type: String } }],
   skills: [String],
   achievements: [String],
-  certifications:  [{ title:{type:String},description:{type:String},link:{type:String}}],
+  certifications: [{ title: { type: String }, description: { type: String }, link: { type: String } }],
   github: String,
   linkedin: String,
   portfolio: String,
   myPortfolioPlugin: { type: String },
+  mentor: { type: mongoose.Schema.Types.ObjectId, ref: "Mentor" }, // Reference to Mentor
 });
 
 export const Student = mongoose.model("Student", studentSchema);
@@ -50,7 +51,6 @@ const mentorSchema = new mongoose.Schema({
       organizationLogo: { type: String, required: true }
     }
   ],
-  
   workExperience: [
     {
       position: { type: String, required: true },
@@ -62,7 +62,9 @@ const mentorSchema = new mongoose.Schema({
   linkedin: String,
   portfolio: String,
   myPortfolioPlugin: { type: String },
+  students: [{ type: mongoose.Schema.Types.ObjectId, ref: "Student" }], // Array of Students
 });
+
 
 const accountSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },

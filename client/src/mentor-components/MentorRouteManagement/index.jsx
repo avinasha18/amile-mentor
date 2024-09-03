@@ -27,7 +27,7 @@ const MentorRouteManagement = () => {
               <Route path="/aimock" element={<InterviewApp />} />
               <Route path="/messages" element={<StartChat />} />
               <Route path="/students" element={<TanStackTable />} />
-              <Route path='/messages' element={<Messages />}/>
+              {/* <Route path='/messages' element={<Messages />}/> */}
               <Route path="/courses/:id" element={<MentorCourseDetails />} />
             </Routes>
           </div>
