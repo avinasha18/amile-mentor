@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { TextField, Button, Box } from '@mui/material';
-import { useTheme } from '../../context/ThemeContext';
-import SendIcon from '@mui/icons-material/Send';
+import { useSelector } from 'react-redux';
+import { Send as SendIcon } from '@mui/icons-material';
 
 function MessageInput({ sendMessage }) {
   const [message, setMessage] = useState('');
-  const { isDarkMode } = useTheme();
+  const isDarkMode = useSelector((state) => state.theme.isDarkMode);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -16,66 +15,40 @@ function MessageInput({ sendMessage }) {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
     }
   };
 
   return (
-    <Box
-      component="form"
+    <form
       onSubmit={handleSubmit}
-      sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 1,
-        p: 1,
-        width: '100%',
-        marginBottom : '80px'
-      }}
+      className="flex items-center gap-2 p-2 w-full mb-20"
     >
-      <TextField
-        multiline
-        maxRows={4}
+      <textarea
+        rows={1}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         placeholder="Type a message..."
-        variant="outlined"
-        fullWidth
         onKeyDown={handleKeyDown}
-        sx={{
-          backgroundColor: isDarkMode ? '#333' : '#fff',
-          color: isDarkMode ? '#fff' : '#000',
-          '& .MuiInputBase-root': {
-            color: isDarkMode ? '#fff' : '#000',
-          },
-          '& .MuiOutlinedInput-root': {
-            '& fieldset': {
-              borderColor: isDarkMode ? '#666' : '#ccc',
-            },
-            '&:hover fieldset': {
-              borderColor: isDarkMode ? '#888' : '#aaa',
-            },
-            '&.Mui-focused fieldset': {
-              borderColor: isDarkMode ? '#aaa' : '#666',
-            },
-          },
-        }}
+        className={`flex-grow resize-none p-2 rounded-md outline-none ${
+          isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'
+        } border ${
+          isDarkMode ? 'border-gray-600' : 'border-gray-300'
+        } focus:ring-2 focus:ring-blue-500`}
       />
       {message.trim() && (
-        <Button
+        <button
           type="submit"
-          variant="contained"
-          color="primary"
-          size="large"
+          className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all"
         >
           <SendIcon />
-        </Button>
+        </button>
       )}
-    </Box>
+    </form>
   );
 }
 
 export default MessageInput;
+  

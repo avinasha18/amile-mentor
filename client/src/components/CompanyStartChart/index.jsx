@@ -1,107 +1,184 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import io from 'socket.io-client';
-
-const socket = io('http://localhost:3000'); // Replace with your server URL
+import React, { useState, useEffect } from "react";
+import ChatList from "../../components/ChatList";
+import ChatWindow from "../../components/ChatWindow";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useSelector } from "react-redux";
+import socket from "../../services/socket/socket";
 
 function StartChat() {
-  const [studentId, setStudentId] = useState('');
-  const [message, setMessage] = useState('');
-  const [chat, setChat] = useState(null);
-  const [messages, setMessages] = useState([]);
-  const companyId = '66c4a5eb4177e452682f5715'; // Replace with the actual company ID
+  const [chats, setChats] = useState([]);
+  const [activeChat, setActiveChat] = useState(null);
+  const isDarkMode = useSelector((state) => state.theme.isDarkMode);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const  mentorId  = useSelector((state) => state.auth.mentorData?._id);
+
+  const [page, setPage] = useState(1);  
+  const [loading, setLoading] = useState(false);
+  const limit = 30;
 
   useEffect(() => {
-    socket.on('receiveMessage', (data) => {
-      if (chat && data.chat._id === chat._id) {
-        setMessages((prevMessages) => [...prevMessages, ...data.chat.messages]);
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    socket.on("receiveMessage", (data) => {
+      setChats((prevChats) => {
+        const updatedChats = prevChats.map((chat) => {
+          if (chat._id === data.chat._id) {
+            return {
+              ...chat,
+              messages: [
+                ...chat.messages,
+                data.chat.messages[data.chat.messages.length - 1],
+              ],
+            };
+          }
+          return chat;
+        });
+
+        return updatedChats;
+      });
+
+      if (activeChat && activeChat._id === data.chat._id) {
+        setActiveChat((prevActiveChat) => ({
+          ...prevActiveChat,
+          messages: [
+            ...prevActiveChat.messages,
+            data.chat.messages[data.chat.messages.length - 1],
+          ],
+        }));
+      }
+    });
+
+    socket.on("updateChats", (updatedChats) => {
+      setChats(updatedChats);
+
+      if (activeChat) {
+        const updatedActiveChat = updatedChats.find(
+          (chat) => chat._id === activeChat._id
+        );
+        if (updatedActiveChat) {
+          setActiveChat(updatedActiveChat);
+        }
       }
     });
 
     return () => {
-      socket.off('receiveMessage');
+      socket.off("receiveMessage");
+      socket.off("updateChats");
     };
-  }, [chat]);
+  }, [activeChat]);
 
-  const handleStartChat = async () => {
-    try {
-      console.log('in handle')
-      const response = await axios.get(`http://localhost:3000/company/${companyId}/student/${studentId}`);
-      setChat(response.data);
-      console.log(response,'res')
-      setMessages(response.data.messages);
+  useEffect(() => {
+    fetchChats(page);
+  }, [page]);
 
-      // Join the room for real-time updates
-      const room = `${companyId}-${studentId}`;
-      socket.emit('joinRoom', room);
-
-      console.log('Chat started or retrieved:', response.data);
-    } catch (error) {
-      console.error('Error starting chat:', error);
-    }
+  // Function to fetch chats with pagination
+  const fetchChats = (pageNumber) => {
+    setLoading(true);
+    socket.emit(
+      "getChats",
+      { message: { mentorId }, page: pageNumber, limit },
+      (response) => {
+        console.log(response);
+        if (response.success) {
+          setChats(response.chats);
+        } else {
+          toast.error("Error fetching chats.");
+        }
+        setLoading(false);
+      }
+    );
   };
 
-  const handleSendMessage = async () => {
-    try {
+  const loadMoreMessages = async(newPage) => {
+
+    socket.emit(
+      "getChats",
+      {
+        message: { mentorId, studentId: activeChat.studentId._id },
+        page: newPage,
+        limit,
+      },
+      (data) => {
+        if (data.success) {
+
+          if (activeChat && activeChat._id === data.chat._id) {
+            setActiveChat((prevActiveChat) => ({
+              ...prevActiveChat,
+              messages: [...data.chat.messages, ...prevActiveChat.messages],
+            }));
+          }
+        } else {
+          toast.error("Error loading more messages.");
+        }
+      }
+    );
+
+
+  };
+
+  const sendMessage = (message) => {
+    if (activeChat && message.trim()) {
       const newMessage = {
-        companyId,
-        studentId,
+        mentorId: activeChat.mentorId._id,
+        studentId: activeChat.studentId._id,
         text: message,
-        sender: 'company',
+        sender: activeChat.mentorId._id,
       };
 
-      const response = await axios.post('http://localhost:3000/send', newMessage);
-      setMessages(response.data.messages);
-      setMessage('');
-
-      // Emit message to the socket server for real-time updates
-      socket.emit('sendMessage', {
-        room: `${companyId}-${studentId}`,
-        chat: response.data,
+      socket.emit("sendMessage", { message: newMessage }, (response) => {
+        console.log(response);
+        if (response.success) {
+          setChats((prevChats) =>
+            prevChats.map((chat) =>
+              chat._id === response.chat._id ? response.chat : chat
+            )
+          );
+          setActiveChat(response.chat);
+        } else {
+          toast.error("Error sending message.");
+        }
       });
-
-      console.log('Message sent:', response.data);
-    } catch (error) {
-      console.error('Error sending message:', error);
     }
   };
 
   return (
-    <div className="p-4">
-      <input
-        type="text"
-        placeholder="Student ID"
-        value={studentId}
-        onChange={(e) => setStudentId(e.target.value)}
-        className="border p-2 mb-2 w-full text-black"
-      />
-      <input
-        type="text"
-        placeholder="Message"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        className="border p-2 mb-2 w-full text-black"
-      />
-      <button
-        onClick={handleStartChat}
-        className="bg-blue-500 text-white p-2 rounded"
-      >
-        Start Chat
-      </button>
-      <button
-        onClick={handleSendMessage}
-        className="bg-green-500 text-white p-2 rounded ml-2"
-      >
-        Send Message
-      </button>
-
-      <div className="mt-4">
-        {messages.map((msg, index) => (
-          <div key={index} className={`p-2 mb-2 ${msg.sender === 'company' ? 'text-right' : 'text-left'}`}>
-            <strong>{msg.sender}:</strong> {msg.text}
-          </div>
-        ))}
-      </div>
+    <div
+      className={`flex h-screen w-full overflow-hidden  ${
+        isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
+      }`}
+    >
+      <ToastContainer />
+      {!activeChat || !isMobile ? (
+        <div
+          className={`flex-none h-full ${
+            isMobile ? "w-full" : "w-1/3"
+          } border-r`}
+        >
+          <ChatList
+            chats={chats}
+            setActiveChat={setActiveChat}
+            activeChat={activeChat}
+            isLoading={loading}
+          />
+        </div>
+      ) : null}
+      {(activeChat || !isMobile) && (
+        <div className={`flex-grow h-full ${isMobile ? "w-full" : "w-2/3"}`}>
+          <ChatWindow
+            activeChat={activeChat}
+            sendMessage={sendMessage}
+            loadMoreMessages={loadMoreMessages}
+            onBack={() => setActiveChat(null)}
+          />
+        </div>
+      )}
     </div>
   );
 }
