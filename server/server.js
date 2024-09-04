@@ -22,7 +22,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(bodyParser.json());
-app.use("/", mentorRoutes);
+app.use("/mentor", mentorRoutes);
 app.use('/', chatRoutes(io));
 
 io.on('connection', (socket) => {
