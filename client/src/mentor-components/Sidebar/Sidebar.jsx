@@ -2,13 +2,14 @@ import { MoreVertical, ChevronLast, ChevronFirst } from "lucide-react"
 import { useContext, createContext, useState } from "react"
 import { Link } from "react-router-dom"
 import { useTheme } from "../../context/ThemeContext"
-
+import { useDispatch, useSelector } from "react-redux"
+import {toggleSidebar} from "../../services/redux/sideBarToggleSlice"
 const SidebarContext = createContext()
 
 export default function Sidebar({ children }) {
   const { isDarkMode } = useTheme()
-  const [expanded, setExpanded] = useState(true)
-
+  const expanded = useSelector((state)=>state.sidebar.isSidebar) 
+const dispatch = useDispatch();
   return (
     <aside className="h-screen">
       <nav className="h-full flex flex-col border-r shadow-sm">
@@ -16,12 +17,12 @@ export default function Sidebar({ children }) {
           <Link to="/">
             <h1 className=" text-[30px] font-bold animate-gradient bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 bg-clip-text text-transparent">
               {
-                expanded ? "Amile" : "A"
+                expanded ? "Amile - Mentor" : "A"
               }
             </h1>
           </Link>
           <button
-            onClick={() => setExpanded((curr) => !curr)}
+            onClick={()=>dispatch(toggleSidebar()) }
             className={`p-1.5 rounded-lg ${isDarkMode ? 'bg-gray-800 text-gray-300 hover:bg-gray-900' : 'bg-gray-50 text-gray-700 hover:bg-gray-100 '}  float-end `}
           >
             {expanded ? <ChevronFirst /> : <ChevronLast />}

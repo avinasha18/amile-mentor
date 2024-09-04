@@ -20,7 +20,7 @@ import { Actions } from "../../hooks/actions";
 
 const UserRegisterFlow = () => {
   const [activeStep, setActiveStep] = useState(0);
-  const [accountType, setAccountType] = useState("");
+  const [accountType, setAccountType] = useState("Mentor");
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
@@ -311,6 +311,7 @@ const StepSelector = ({ handleAccountTypeChange, accountType, error }) => (
     <Button
       variant={accountType === "Student" ? "contained" : "outlined"}
       color="primary"
+      disabled
       sx={{
         width: "100%",
         maxWidth: 300,

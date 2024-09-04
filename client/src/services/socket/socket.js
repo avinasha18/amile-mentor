@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
-import { api } from "../../hooks/apis";
+import { socketapi } from "../../hooks/apis";
 
-const socket = io(api);
+const socket = io(socketapi);
 
 
 export default socket;

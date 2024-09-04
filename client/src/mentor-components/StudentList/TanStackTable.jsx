@@ -24,15 +24,9 @@ const TanStackTable = () => {
     useEffect(() => {
         const loadDataAndAssignStudents = async () => {
             try {
-                // Get the username from cookies
-                const username = Cookies.get('mentor');
+
     
-                if (!username) {
-                    console.error("Username cookie not found");
-                    return;
-                }
-    
-                const responseStudent = await Actions.getStudent({ username: username });
+                const responseStudent = await Actions.getStudent();
                 if (responseStudent.data.success) {
                     // Map the student usernames into the structure expected by the table
                     const mappedData = responseStudent.data.studentUsernames.map((username, index) => ({

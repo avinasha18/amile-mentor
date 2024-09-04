@@ -6,16 +6,12 @@ export const Actions = {
         return await axios.post(`${api}/login`, { ...data });
     },
     Register: async (data) => {
-        const endpoint = data.accountType === "Student"
-            ? `/register/student?refrelid=${data.refrelid}`
-            : `/register`;
+        const endpoint ="/register";
         return await axios.post(`${api}${endpoint}`, { ...data });
     },
-    VerifyAccount: async (data) => {
-        return await axios.post(`${api}/verifyaccount?token=${data.accountid}`);
-    },
+
     VerifyMentorAccount: async (data) => {
-        return await axios.post(`${api}/verifyaccount?token=${data.accountid}`);
+        return await axios.post(`${api}/verifyaccount?token=${data.accountid}&ismentor=true`);
     },
 
     fetchMentor: async () => {
@@ -39,6 +35,12 @@ export const Actions = {
     },
     fetchCourse: async (data) => {
         return await axios.get(`${api}/course?courseid=${data.courseid}`);
+    },
+    assignStudent: async (data) => {
+        return await axios.post(`${api}/assign`, data);
+    },
+    getStudent: async () => {
+        return await axios.get(`${api}/getStudents`);
     }
 };
 
