@@ -392,46 +392,34 @@ export const updateMentor = async (req, res) => {
 };
 
 export const assignStudents = async (req, res) => {
-    const { mentorUsername, studentUsernames } = req.body;
-    console.log(req.body)
+    const { mentorUsername, studentUsername } = req.body;
+    console.log(req.body);
 
     try {
-        // Find the mentor by username
         const mentor = await Mentor.findOne({ username: mentorUsername });
 
         if (!mentor) {
             return res.status(404).json({ success: false, message: "Mentor not found" });
         }
 
-        // Find all students by their usernames
-        const students = await Student.find({ username: { $in: studentUsernames } });
+        const studentIds = await Student.find({ username: { $in: studentUsername } }).select('_id');
 
-        if (students.length !== studentUsernames.length) {
-            return res.status(404).json({ success: false, message: "One or more students not found" });
+        if (studentIds.length === 0) {
+            return res.status(404).json({ success: false, message: "No students found with the provided usernames" });
         }
 
-        // Filter out students already assigned to this mentor
-        const newStudents = students.filter(student => !mentor.students.includes(student._id));
+        const newStudentIds = studentIds.map(student => student._id).filter(id => !mentor.students.includes(id));
 
-        if (newStudents.length === 0) {
-            return res.status(200).json({ success: false, message: "All students are already assigned to this mentor" });
-        }
-
-        // Assign mentor to each new student and update the mentor's students array
-        await Promise.all(newStudents.map(async (student) => {
-            student.mentor = mentor._id;
-            await student.save();
-        }));
-
-        mentor.students = [...mentor.students, ...newStudents.map(student => student._id)];
+        mentor.students = [...mentor.students, ...newStudentIds];
         await mentor.save();
 
         return res.status(200).json({ success: true, message: "Students successfully assigned to mentor" });
-    } catch(err) {
+    } catch (err) {
         console.log(err);
         return res.status(500).send("Server error");
     }
-}
+};
+
 
 export const getStudents = async (req, res) => {
     try {

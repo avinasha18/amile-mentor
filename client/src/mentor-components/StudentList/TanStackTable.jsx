@@ -51,7 +51,7 @@ const TanStackTable = () => {
     
                 // const studentUsernames = userData.map(student => student.userName);
 
-                // const response = await Actions.assignStudent({ mentorUsername: username, studentUsernames: studentUsernames });
+                // const response = await Actions.assignStudent({ mentorUsername: username, studentUsername: studentUsername });
     
                 // if (response.data.success) {
                 //     console.log(response.data.message);
