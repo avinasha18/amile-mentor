@@ -6,7 +6,7 @@ const authSlice = createSlice({
   initialState: {
     token: Cookies.get('token') || null,
     mentor: Cookies.get('mentor') || null,
-    mentorData : Cookies.get('mentorData') || null,
+    mentorData : JSON.parse( Cookies.get('mentorData') || null),
    
   },
   reducers: {
