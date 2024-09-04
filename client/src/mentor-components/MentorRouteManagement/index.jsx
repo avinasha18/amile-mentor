@@ -20,14 +20,16 @@ const MentorRouteManagement = () => {
           <MentorNavbar />
           <div className="flex-1">
             <Routes>
-              <Route path="/" element={<MentorHome />} />
-              <Route path="/profile" element={<MentorProfile />} />
-              <Route path="/courses" element={<MentorCourses />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/aimock" element={<InterviewApp />} />
-              <Route path="/messages" element={<StartChat />} />
-              <Route path="/students" element={<TanStackTable />} />
-              <Route path="/courses/:id" element={<MentorCourseDetails />} />
+              <Route path="/mentor">
+                <Route index element={<MentorHome />} />
+                <Route path="profile" element={<MentorProfile />} />
+                <Route path="courses" element={<MentorCourses />} />
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="aimock" element={<InterviewApp />} />
+                <Route path="messages" element={<StartChat />} />
+                <Route path="students" element={<TanStackTable />} />
+                <Route path="courses/:id" element={<MentorCourseDetails />} />
+              </Route>
             </Routes>
           </div>
         </div>

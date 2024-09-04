@@ -12,6 +12,7 @@ import DownloadBtn from "./DownloadBtn";
 import DebouncedInput from "./DebouncedInput";
 import UserDetailModal from "./UserDetailModal";
 import { fetchUserData } from "./data";
+import { Actions } from "../../hooks/actions";
 
 const TanStackTable = () => {
     const columnHelper = createColumnHelper();
@@ -21,21 +22,49 @@ const TanStackTable = () => {
     const [globalFilter, setGlobalFilter] = useState("");
 
     useEffect(() => {
-        // Get the username from cookies
-        const username = Cookies.get('mentor');
+        const loadDataAndAssignStudents = async () => {
+            try {
+                // Get the username from cookies
+                const username = Cookies.get('mentor');
+    
+                if (!username) {
+                    console.error("Username cookie not found");
+                    return;
+                }
+    
+                const responseStudent = await Actions.getStudent({ username: username });
+                if (responseStudent.data.success) {
+                    // Map the student usernames into the structure expected by the table
+                    const mappedData = responseStudent.data.studentUsernames.map((username, index) => ({
+                        id: index + 1, // Assign a sequential ID
+                        userName: username,
+                        progress: 0 // Add a default progress if needed
+                    }));
+                    setData(mappedData);
+                } else {
+                    console.log(responseStudent.data.message);
+                }
 
-        if (username) {
-            // Fetch the data for the logged-in user
-            const loadData = async () => {
-                const userData = await fetchUserData(username);
-                setData(userData);
-            };
+                // const userData = await fetchUserData(username);
+                // setData(userData);
+                // console.log(userData);
+    
+                // const studentUsernames = userData.map(student => student.userName);
 
-            loadData();
-        } else {
-            console.error("Username cookie not found");
-        }
-    }, []);
+                // const response = await Actions.assignStudent({ mentorUsername: username, studentUsernames: studentUsernames });
+    
+                // if (response.data.success) {
+                //     console.log(response.data.message);
+                // } else {
+                //     console.log(response.data.message);
+                // }
+            } catch (err) {
+                console.error("Error occurred:", err);
+            }
+        };
+    
+        loadDataAndAssignStudents();
+    }, []);    
 
     const columns = [
         columnHelper.accessor("id", {

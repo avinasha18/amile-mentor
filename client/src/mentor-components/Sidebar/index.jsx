@@ -28,7 +28,7 @@ const MentorSidebar = () => {
             icon={<CgProfile />}
             onClick={() => {
               handleItemClick("Profile");
-              nav("/profile");
+              nav("/mentor/profile");
             }}
           />
           <SidebarItem
@@ -37,7 +37,7 @@ const MentorSidebar = () => {
             active={activeItem === "Students"}
             onClick={() => {
               handleItemClick("Students");
-              nav("/students");
+              nav("/mentor/students");
             }}
           />
           <SidebarItem
@@ -46,7 +46,7 @@ const MentorSidebar = () => {
             active={activeItem === "Messages"}
             onClick={() => {
               handleItemClick("Messages");
-              nav("/messages");
+              nav("/mentor/messages");
             }}
           />
           <SidebarItem
@@ -55,7 +55,7 @@ const MentorSidebar = () => {
             active={activeItem === "Interview"}
             onClick={() => {
               handleItemClick("Interview");
-              nav("/aimock");
+              nav("/mentor/aimock");
             }}
           />
           <SidebarItem
@@ -65,7 +65,7 @@ const MentorSidebar = () => {
             alert
             onClick={() => {
               handleItemClick("Inventory");
-              nav("/courses");
+              nav("/mentor/courses");
             }}
           />
           <SidebarItem
