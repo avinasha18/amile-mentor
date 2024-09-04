@@ -6,32 +6,18 @@ export const Actions = {
         return await axios.post(`${api}/login`, { ...data });
     },
     Register: async (data) => {
-        const endpoint = data.accountType === "Student"
-            ? `/register/student?refrelid=${data.refrelid}`
-            : `/register/mentor?refrelid=${data.refrelid}`;
+        const endpoint ="/register";
         return await axios.post(`${api}${endpoint}`, { ...data });
     },
-    VerifyAccount: async (data) => {
-        return await axios.post(`${api}/verifyaccount?token=${data.accountid}`);
-    },
+
     VerifyMentorAccount: async (data) => {
-        return await axios.post(`${api}/mentor/verifyaccount?token=${data.accountid}`);
+        return await axios.post(`${api}/verifyaccount?token=${data.accountid}&ismentor=true`);
     },
-    FetchMyReferals: async (data) => {
-        return await axios.get(`${api}/myreferals?page=${data.page || 1}`);
-    },
-    ConnectPlugin: async (data) => {
-        return await axios.post(`${api}/connectplugin`, { ...data });
-    },
-    fetchUser: async () => {
-        return await axios.get(`${api}/userdata`);
-    },
+
     fetchMentor: async () => {
         return await axios.get(`${api}/mentordata`);
     },
-    UpdateStudent: async (data) => {
-        return await axios.post(`${api}/updateuser`, { ...data });
-    },
+
     updateMentor: async (data) => {
         return await axios.post(`${api}/updatementor`, { ...data });
     },
@@ -53,12 +39,8 @@ export const Actions = {
     assignStudent: async (data) => {
         return await axios.post(`${api}/assign`, data);
     },
-    getStudent: async (data) => {
-        const { username } = data;
-        console.log(data)
-        return await axios.get(`${api}/getStudents`, {
-            params: { username }
-        });
+    getStudent: async () => {
+        return await axios.get(`${api}/getStudents`);
     }
 };
 

@@ -110,7 +110,7 @@ const Login = () => {
       const response = await Actions.Login({
         username: email.trim(),
         password,
-        userType, // Include the selected userType in the request
+        userType, 
       });
       if (response.data.success) {
         const cookieExpires = rememberMe ? 10 : 1;

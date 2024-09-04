@@ -11,9 +11,10 @@ function StartChat() {
   const [activeChat, setActiveChat] = useState(null);
   const isDarkMode = useSelector((state) => state.theme.isDarkMode);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  const  mentorId  = useSelector((state) => state.auth.mentorData?._id);
+  const mentorId = useSelector((state) => state.auth.mentorData?._id);
 
-  const [page, setPage] = useState(1);  
+  console.log(mentorId);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const limit = 30;
 
@@ -81,6 +82,7 @@ function StartChat() {
   // Function to fetch chats with pagination
   const fetchChats = (pageNumber) => {
     setLoading(true);
+    console.log(pageNumber);
     socket.emit(
       "getChats",
       { message: { mentorId }, page: pageNumber, limit },
@@ -96,8 +98,7 @@ function StartChat() {
     );
   };
 
-  const loadMoreMessages = async(newPage) => {
-
+  const loadMoreMessages = async (newPage) => {
     socket.emit(
       "getChats",
       {
@@ -107,7 +108,6 @@ function StartChat() {
       },
       (data) => {
         if (data.success) {
-
           if (activeChat && activeChat._id === data.chat._id) {
             setActiveChat((prevActiveChat) => ({
               ...prevActiveChat,
@@ -119,8 +119,6 @@ function StartChat() {
         }
       }
     );
-
-
   };
 
   const sendMessage = (message) => {
