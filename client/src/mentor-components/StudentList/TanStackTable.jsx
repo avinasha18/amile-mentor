@@ -32,22 +32,32 @@ const TanStackTable = () => {
                     return;
                 }
     
-                // Fetch the data for the logged-in user
-                const userData = await fetchUserData(username);
-                setData(userData);
-                console.log(userData);
-    
-                const studentUsernames = userData.map(student => student.userName);
-
-                // Now, assign students with the fetched user data
-                const response = await Actions.assignStudent({ mentorUsername: username, studentUsernames: studentUsernames });
-    
-                if (response.data.success) {
-                    console.log(response.data.message);
+                const responseStudent = await Actions.getStudent({ username: username });
+                if (responseStudent.data.success) {
+                    // Map the student usernames into the structure expected by the table
+                    const mappedData = responseStudent.data.studentUsernames.map((username, index) => ({
+                        id: index + 1, // Assign a sequential ID
+                        userName: username,
+                        progress: 0 // Add a default progress if needed
+                    }));
+                    setData(mappedData);
                 } else {
-                    console.log(response.data.message);
+                    console.log(responseStudent.data.message);
                 }
+
+                // const userData = await fetchUserData(username);
+                // setData(userData);
+                // console.log(userData);
     
+                // const studentUsernames = userData.map(student => student.userName);
+
+                // const response = await Actions.assignStudent({ mentorUsername: username, studentUsernames: studentUsernames });
+    
+                // if (response.data.success) {
+                //     console.log(response.data.message);
+                // } else {
+                //     console.log(response.data.message);
+                // }
             } catch (err) {
                 console.error("Error occurred:", err);
             }

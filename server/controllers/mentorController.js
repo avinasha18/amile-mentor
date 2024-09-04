@@ -432,3 +432,26 @@ export const assignStudents = async (req, res) => {
         return res.status(500).send("Server error");
     }
 }
+
+export const getStudents = async (req, res) => {
+    try {
+        const { username } = req.query;
+
+        const mentor = await Mentor.findOne({ username: username });
+        if (!mentor) {
+            return res.status(404).json({ success: false, message: "Mentor not found" });
+        }
+
+        if (mentor.students && mentor.students.length > 0) {
+            const students = await Student.find({ _id: { $in: mentor.students } }, 'username');
+
+            const studentUsernames = students.map(student => student.username);
+            return res.status(200).json({ success: true, studentUsernames });
+        } else {
+            return res.status(200).json({ success: false, message: "No students assigned to this mentor" });
+        }
+    } catch (err) {
+        console.error(err);
+        return res.status(500).send("Server error");
+    }
+}
