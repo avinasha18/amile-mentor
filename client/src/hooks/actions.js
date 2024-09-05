@@ -17,7 +17,6 @@ export const Actions = {
     fetchMentor: async () => {
         return await axios.get(`${api}/mentordata`);
     },
-
     updateMentor: async (data) => {
         return await axios.post(`${api}/updatementor`, { ...data });
     },
