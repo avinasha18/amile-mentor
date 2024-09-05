@@ -155,7 +155,7 @@ function InterviewApp() {
 
   if (showAnimation) {
     return (
-      <div className="h-screen w-screen flex items-center justify-center bg-gradient-to-br from-blue-400 to-indigo-600">
+      <div className="h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-400 to-indigo-600">
         <Lottie
           options={{
             loop: true,
@@ -170,7 +170,7 @@ function InterviewApp() {
   }
 
   return (
-    <div className="min-h-screen w-screen overflow-y-auto no-scrollbar bg-gradient-to-br from-blue-100 to-indigo-200 flex items-center justify-center py-20 p-2">
+    <div className="min-h-full w-full overflow-y-auto no-scrollbar bg-gradient-to-br from-blue-100 to-indigo-200 flex items-center justify-center py-5 p-2">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}

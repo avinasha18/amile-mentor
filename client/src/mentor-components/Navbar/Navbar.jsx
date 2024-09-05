@@ -5,14 +5,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { FaRegBell } from "react-icons/fa";
 import { TfiDashboard } from "react-icons/tfi";
-import './index.css';
+import "./index.css";
 import { logout } from "../../services/redux/AuthSlice";
-import Badge from '@mui/material/Badge';
-import MailIcon from '@mui/icons-material/Mail';
+import Badge from "@mui/material/Badge";
+import MailIcon from "@mui/icons-material/Mail";
 import { setAuthToken } from "../../hooks/golbalAuth";
 import SearchBox from "./SearchBox";
 
-const MentorNavbar = () => {
+const MentorNavbar = ({ islogin }) => {
+
   const [isMenuOpen, setMenu] = useState(false);
   const { isDarkMode, toggleTheme } = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
@@ -23,12 +24,11 @@ const MentorNavbar = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await dispatch(logout());
-    setAuthToken(); // This clears the token from the axios headers
+    dispatch(logout());
+    setAuthToken();
     navigate("/login");
   };
 
-  // Close the menu when clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -43,16 +43,22 @@ const MentorNavbar = () => {
   }, [menuRef]);
 
   return (
-    <header className={`${isDarkMode ? "bg-black text-gray-100" : "bg-white text-gray-800"
-      } shadow-md z-50 px-5 h-[70px] border-b ${isDarkMode ? "border-gray-700" : "border-gray-200"
-      } sticky top-0`}>
+    <header
+      className={`${
+        isDarkMode ? "bg-black text-gray-100" : "bg-white text-gray-800"
+      } shadow-md z-50 px-5 h-[70px] border-b ${
+        isDarkMode ? "border-gray-700" : "border-gray-200"
+      } sticky top-0`}
+    >
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <SearchBox />
-        <nav className="hidden md:flex space-x-6">
-        </nav>
-        <div className="relative flex flex-row gap-10 items-center" ref={menuRef}>
+        <nav className="hidden md:flex space-x-6"></nav>
+        <div
+          className="relative flex flex-row gap-10 items-center"
+          ref={menuRef}
+        >
           <Link to="/dashboard">
-            <TfiDashboard className="text-2xl"/>
+            <TfiDashboard className="text-2xl" />
           </Link>
           <button
             onClick={toggleTheme}
@@ -66,19 +72,43 @@ const MentorNavbar = () => {
             )}
           </button>
           <Link to="/messages">
-            <Badge badgeContent={4} color="primary" variant="dot" anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'right',
-            }}>
+            <Badge
+              badgeContent={4}
+              color="primary"
+              variant="dot"
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+            >
               <FaRegBell className="text-xl" />
             </Badge>
           </Link>
-          <button
-            onClick={() => setMenu(!isMenuOpen)}
-            className="flex items-center space-x-2"
-          >
-            <FaUserCircle className="text-4xl" />
-          </button>
+
+          {!islogin ? (
+            <div className="flex space-x-4">
+              <button
+                onClick={() => navigate("/signup")}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Mentor Students
+              </button>
+              <button
+                onClick={() => navigate("/login")}
+                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Login
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setMenu(!isMenuOpen)}
+              className="flex items-center space-x-2"
+            >
+              <FaUserCircle className="text-4xl text-gray-600" />
+            </button>
+          )}
+
           {isMenuOpen && <UserMenu onLogout={handleLogout} />}
         </div>
       </div>

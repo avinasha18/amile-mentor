@@ -23,7 +23,7 @@ function App() {
   const userId = useSelector((state) => state.auth.mentorData?._id);
   const memoizedUserId = useMemo(() => userId, [userId]);
   useEffect(() => {
-    if (islogin) {
+    if (islogin && userId) {
       socket.on('connect', () => {
         socket.emit('joinChat', { userId: memoizedUserId });
         console.log(`Emitted joinChat for User ID: ${memoizedUserId} on socket connect`);
@@ -55,7 +55,7 @@ function App() {
           path="/login"
           element={!islogin ? <Login /> : <PageNotFound />}
         />
-        <Route path="/*" element={<MentorRouteManagement />} />
+        <Route path="/*" element={<MentorRouteManagement islogin={islogin}/>} />
       </Routes>
       <ToastContainer
         position="bottom-center"

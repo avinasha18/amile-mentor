@@ -19,7 +19,7 @@ const MentorSidebar = () => {
   };
 
   return (
-    <main className={`${isDarkMode ? "bg-black" : "bg-white"}`}>
+    <main className={`${isDarkMode ? "bg-black" : "bg-white"} z-50`}>
       <Sidebar>
         <div className="flex-1">
           <SidebarItem
