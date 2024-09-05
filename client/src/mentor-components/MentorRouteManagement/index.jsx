@@ -20,7 +20,7 @@ const MentorRouteManagement = () => {
           <MentorNavbar />
           <div className="flex-1">
             <Routes>
-              <Route path="/mentor">
+              <Route path="/">
                 <Route index element={<MentorHome />} />
                 <Route path="profile" element={<MentorProfile />} />
                 <Route path="courses" element={<MentorCourses />} />

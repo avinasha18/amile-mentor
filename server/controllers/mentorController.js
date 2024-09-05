@@ -419,8 +419,6 @@ export const assignStudents = async (req, res) => {
         return res.status(500).send("Server error");
     }
 };
-
-
 export const getStudents = async (req, res) => {
     try {
         const { username } = req.query;

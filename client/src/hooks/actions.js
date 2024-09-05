@@ -41,6 +41,9 @@ export const Actions = {
     },
     getStudent: async () => {
         return await axios.get(`${api}/getStudents`);
+    },
+    getAvgProgress: async () => {
+        return await axios.get(`${api}/getavgprogress`)
     }
 };
 

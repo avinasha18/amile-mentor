@@ -11,7 +11,6 @@ import Cookies from "js-cookie"; // Import js-cookie to access cookies
 import DownloadBtn from "./DownloadBtn";
 import DebouncedInput from "./DebouncedInput";
 import UserDetailModal from "./UserDetailModal";
-import { fetchUserData } from "./data";
 import { Actions } from "../../hooks/actions";
 
 const TanStackTable = () => {
@@ -24,41 +23,36 @@ const TanStackTable = () => {
     useEffect(() => {
         const loadDataAndAssignStudents = async () => {
             try {
-
-    
+                // Fetch student data
                 const responseStudent = await Actions.getStudent();
-                if (responseStudent.data.success) {
-                    // Map the student usernames into the structure expected by the table
-                    const mappedData = responseStudent.data.studentUsernames.map((username, index) => ({
-                        id: index + 1, // Assign a sequential ID
-                        userName: username,
-                        progress: 0 // Add a default progress if needed
-                    }));
+                
+                // Fetch average progress data
+                const responseAvgProgress = await Actions.getAvgProgress();
+
+                if (responseStudent.data.success && responseAvgProgress.data.success) {
+                    // Combine student data with average progress
+                    const mappedData = responseStudent.data.studentUsernames.map((username, index) => {
+                        const studentProgress = responseAvgProgress.data.studentData.find(
+                            (student) => student.username === username
+                        );
+
+                        return {
+                            id: index + 1, // Assign a sequential ID
+                            userName: username,
+                            progress: studentProgress ? Math.round(studentProgress.avgProgress) : 0, // Add the average progress
+                        };
+                    });
                     setData(mappedData);
                 } else {
-                    console.log(responseStudent.data.message);
+                    console.log("Failed to fetch student or progress data");
                 }
-
-                // const userData = await fetchUserData(username);
-                // setData(userData);
-                // console.log(userData);
-    
-                // const studentUsernames = userData.map(student => student.userName);
-
-                // const response = await Actions.assignStudent({ mentorUsername: username, studentUsername: studentUsername });
-    
-                // if (response.data.success) {
-                //     console.log(response.data.message);
-                // } else {
-                //     console.log(response.data.message);
-                // }
             } catch (err) {
                 console.error("Error occurred:", err);
             }
         };
-    
+
         loadDataAndAssignStudents();
-    }, []);    
+    }, []);
 
     const columns = [
         columnHelper.accessor("id", {
