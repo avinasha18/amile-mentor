@@ -25,8 +25,7 @@ const TanStackTable = () => {
     const [globalFilter, setGlobalFilter] = useState("");
     const nav = useNavigate();
     const mentorId = useSelector((state) => state.auth.mentorData?._id);
-    const isDarkMode = useSelector((state)=>state.theme.isDarkMode)
-
+    const isDarkMode = useSelector((state) => state.theme.isDarkMode);
 
     useEffect(() => {
         const loadDataAndAssignStudents = async () => {
@@ -40,14 +39,16 @@ const TanStackTable = () => {
                 if (responseStudent.data.success && responseAvgProgress.data.success) {
                     // Combine student data with average progress
                     const mappedData = responseStudent.data.studentUsernames.map((username, index) => {
+                        // Find the corresponding progress data for each student
                         const studentProgress = responseAvgProgress.data.studentData.find(
-                            (student) => student.username === username
+                            (student) => student.username === username.username // Assuming username is an object with the 'username' field
                         );
 
                         return {
-                            id: index + 1, // Assign a sequential ID
-                            userName: username,
-                            progress: studentProgress ? Math.round(studentProgress.avgProgress) : 0, // Add the average progress
+                            index: index + 1, // Assign a sequential ID
+                            id: username._id, // Assuming you have a unique identifier for each student
+                            userName: username.username, // Get the username
+                            progress: studentProgress ? Math.round(studentProgress.avgProgress) : 0, // Display progress
                         };
                     });
                     setData(mappedData);
@@ -72,7 +73,7 @@ const TanStackTable = () => {
             cell: (info) => (
                 <a
                     href="#"
-                    className="text-indigo-700  hover:text-indigo-600"
+                    className={`${isDarkMode ? 'text-white' : 'text-indigo-700'} text-base hover:text-indigo-600`}
                     onClick={() => {
                         setSelectedUser(info.row.original);
                         setIsModalOpen(true);
@@ -88,22 +89,29 @@ const TanStackTable = () => {
             header: "Progress",
         }),
         columnHelper.accessor("id", {
-            cell: (info) => <button className="text-white bg-green-700 hover:bg-green-800 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800" onClick={()=>startChat(info.getValue())}>Start Chat</button>,
+            cell: (info) => (
+                <button 
+                    className="text-white bg-green-700 hover:bg-green-800 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800" 
+                    onClick={() => startChat(info.getValue())}
+                >
+                    Start Chat
+                </button>
+            ),
             header: "Actions",
         }),
     ];
 
     const startChat = (applicantId) => {
-        console.log(mentorId)
-        socket.emit('startChat', { mentorId, studentId:applicantId }, (response) => {
+        console.log(mentorId);
+        socket.emit('startChat', { mentorId, studentId: applicantId }, (response) => {
             console.log(response);
-          if (response.success) {
-            nav("/mentor/messages")
-          } else {
-            toast.error('Error starting chat. Please try again.');
-          }
+            if (response.success) {
+                nav("/messages");
+            } else {
+                toast.error('Error starting chat. Please try again.');
+            }
         });
-      };
+    };
 
     const table = useReactTable({
         data,
@@ -117,7 +125,7 @@ const TanStackTable = () => {
     });
 
     return (
-        <div className={`p-6 w-full h-full  mx-auto ${isDarkMode?"bg-gradient-to-br from-gray-800 via-gray-900 to-black":"bg-gradient-to-br from-white via-white to-white"}  text-gray-900  shadow-2xl backdrop-blur-lg`}>
+        <div className={`p-6 w-full h-full mx-auto ${isDarkMode ? "bg-gradient-to-br from-gray-800 via-gray-900 to-black" : "bg-gradient-to-br from-white via-white to-white"} text-gray-900 shadow-2xl backdrop-blur-lg`}>
             <div className="flex justify-between mb-4">
                 <div className="w-full flex items-center gap-2">
                     <DebouncedInput
@@ -129,7 +137,7 @@ const TanStackTable = () => {
                 </div>
                 <DownloadBtn data={data} fileName={"students"} />
             </div>
-            <table className={`border border-gray-700 w-full text-left rounded-lg shadow-md `}>
+            <table className={`border border-gray-700 w-full text-left rounded-lg shadow-md`}>
                 <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-t-lg">
                     {table.getHeaderGroups().map((headerGroup) => (
                         <tr key={headerGroup.id}>
@@ -149,7 +157,7 @@ const TanStackTable = () => {
                         table.getRowModel().rows.map((row, i) => (
                             <tr
                                 key={row.id}
-                                className={`${i % 2 === 0 ? isDarkMode? "bg-gray-800 text-white":"bg-gray-300 text-black" :  isDarkMode? "bg-gray-700 text-white" :"bg-white-300 text-black"} hover:bg-gray-500 transition-transform transform duration-300 rounded-lg`}
+                                className={`${i % 2 === 0 ? isDarkMode ? "bg-gray-800 text-white" : "bg-gray-300 text-black" : isDarkMode ? "bg-gray-700 text-white" : "bg-white-300 text-black"} hover:${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} bg-opacity-80 transition-transform transform duration-300 rounded-lg`}
                             >
                                 {row.getVisibleCells().map((cell) => (
                                     <td key={cell.id} className="px-6 py-4 text-sm">
@@ -207,12 +215,13 @@ const TanStackTable = () => {
                 </select>
             </div>
 
-            {/* User Detail Modal */}
-            <UserDetailModal
-                user={selectedUser}
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-            />
+            {selectedUser && (
+                <UserDetailModal
+                    isModalOpen={isModalOpen}
+                    setIsModalOpen={setIsModalOpen}
+                    selectedUser={selectedUser}
+                />
+            )}
         </div>
     );
 };

@@ -30,7 +30,7 @@ const MentorRouteManagement = ({ islogin }) => {
           <div className="flex-1">
             <Routes>
               <Route
-                path="/mentor"
+                path="/"
                 element={
                   <ProtectedRoute isLogin={islogin} nextPath={location.pathname}>
                     <MentorHome />
@@ -38,7 +38,7 @@ const MentorRouteManagement = ({ islogin }) => {
                 }
               />
               <Route
-                path="/mentor/profile"
+                path="/profile"
                 element={
                   <ProtectedRoute isLogin={islogin} nextPath={location.pathname}>
                     <MentorProfile />
@@ -46,7 +46,7 @@ const MentorRouteManagement = ({ islogin }) => {
                 }
               />
               <Route
-                path="/mentor/courses"
+                path="/courses"
                 element={
                   <ProtectedRoute isLogin={islogin} nextPath={location.pathname}>
                     <MentorCourses />
@@ -54,7 +54,7 @@ const MentorRouteManagement = ({ islogin }) => {
                 }
               />
               <Route
-                path="/mentor/dashboard"
+                path="/dashboard"
                 element={
                   <ProtectedRoute isLogin={islogin} nextPath={location.pathname}>
                     <Dashboard />
@@ -62,7 +62,7 @@ const MentorRouteManagement = ({ islogin }) => {
                 }
               />
               <Route
-                path="/mentor/aimock"
+                path="/aimock"
                 element={
                   <ProtectedRoute isLogin={islogin} nextPath={location.pathname}>
                     <InterviewApp />
@@ -70,7 +70,7 @@ const MentorRouteManagement = ({ islogin }) => {
                 }
               />
               <Route
-                path="/mentor/messages"
+                path="/messages"
                 element={
                   <ProtectedRoute isLogin={islogin} nextPath={location.pathname}>
                     <StartChat />
@@ -78,7 +78,7 @@ const MentorRouteManagement = ({ islogin }) => {
                 }
               />
               <Route
-                path="/mentor/students"
+                path="/students"
                 element={
                   <ProtectedRoute isLogin={islogin} nextPath={location.pathname}>
                     <TanStackTable />
@@ -86,7 +86,7 @@ const MentorRouteManagement = ({ islogin }) => {
                 }
               />
               <Route
-                path="/mentor/courses/:id"
+                path="/courses/:id"
                 element={
                   <ProtectedRoute isLogin={islogin} nextPath={location.pathname}>
                     <MentorCourseDetails />
